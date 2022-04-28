@@ -10,36 +10,7 @@
       </div>
     </header>
 
-    <div id="user-cart" class="container">
-      <!-- <section id="cart">
-        <article class="product">
-          <header>
-            <a class="removeoff">
-              <img
-                src="http://www.astudio.si/preview/blockedwp/wp-content/uploads/2012/08/1.jpg"
-                alt=""
-              />
-            </a>
-          </header>
-
-          <div class="content">
-            <h1>Lorem ipsum</h1>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Soluta, numquam quis
-            perspiciatis ea ad omnis provident laborum dolore in atque.
-          </div>
-
-          <footer class="content">
-            <span class="qt-minus">-</span>
-            <span class="qt">2</span>
-            <span class="qt-plus">+</span>
-
-            <h2 class="full-price">29.98€</h2>
-
-            <h2 class="price">14.99€</h2>
-          </footer>
-        </article>
-      </section>
-       -->
+    <div id="user-cart" class="container" style="border-top: 3px solid #000; margin-top: 15px;">
     </div>
 
     <footer id="site-footer" style="padding:30px 15px;">
@@ -57,17 +28,14 @@
                     Service Charge: <span>-</span>
                 </div>
                 <div class="subtotal" style="float:none; width:auto;">
-                    Sub Total: <span>0</span>
+                    Sub Total: RM<span>0</span>
                 </div>
                 <div class="total">
-                    Total: <span>0</span>
+                    Total: RM<span>0</span>
                 </div>
                 <a class="btn d-inline-block" @click="checkout">Checkout</a>
             </div>
-
         </div>
-
-
     </footer>
 
     <div class="modal fade" id="checkoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -87,7 +55,7 @@
             </div>
             <div class="form-group d-flex">
                 <label for="message-text" class="col-form-label">Total:</label>
-                <span class="m-auto">{{payableAmount}}</span>
+                <span class="m-auto">{{payableAmount / 100}}</span>
             </div>
             <div class="form-group d-flex">
                 <label for="message-text" class="col-form-label">Payment Method:</label>
@@ -106,7 +74,7 @@
             </div>
             <div class="form-group d-flex">
                 <label for="message-text" class="col-form-label">Change:</label>
-                <span class="m-auto">{{changes}}</span>
+                <span class="m-auto">{{changes/100}}</span>
             </div>
             </form>
         </div>
@@ -176,8 +144,8 @@ export default {
             html += '<span class="qt-minus">-</span>';
             html += '<span class="qt">' + product.quantity + "</span>";
             html += '<span class="qt-plus">+</span>';
-            html += '<h2 class="full-price">' + product.amount + "</h2>";
-            html += '<h2 class="price">' + this.productData[product.product_id].price + "</h2>";
+            html += '<h2 class="full-price">RM ' + product.amount /100 + "</h2>";
+            html += '<h2 class="price">RM ' + this.productData[product.product_id].price /100 + "</h2>";
             html += "</footer>";
             html += "</article>";
 
@@ -192,10 +160,10 @@ export default {
                 $("#user-cart").append(section);
             }
 
-            $(".subtotal span").html(product.calculated_amount);
+            $(".subtotal span").html(product.calculated_amount/100);
             $(".tax span").html(product.tax+' %');
             $(".service_charge span").html(product.service_charge+' %');
-            $(".total span").html(product.payable_amount);
+            $(".total span").html(product.payable_amount/100);
             this.payableAmount = product.payable_amount;
 
             $(".qt-plus").click(function () {
@@ -252,6 +220,7 @@ export default {
             html += '<header class="productlist" product_id=' + product.id + ">";
             html += '   <a class="productid">' + product.id + "</a>";
             html += '   <a class="productname">' + product.name + "</a>";
+            html += '   <div class="productprice text-center">RM ' + product.price/100 + "</div>";
             html += "</header>";
             });
             html += "</article>";
@@ -319,7 +288,7 @@ export default {
                 return false;
             }
 
-            if(this.totalPaid < this.payableAmount) {
+            if((this.totalPaid * 100) < this.payableAmount) {
                 alert ('total paid amount cant be less than payable amount.');
                 return false;
             }
@@ -350,11 +319,13 @@ export default {
             this.form.payment_method_id = event.target.value;
         },
         calculateChange() {
-            let amount = this.totalPaid - this.payableAmount;
+            let amount = (this.totalPaid * 100) - this.payableAmount;
 
             if (amount <= 0) {
                 amount = 0;
             }
+
+            this.totalPaid = this.totalPaid.replace(/^0+/, '');
 
             this.changes = amount;
         },

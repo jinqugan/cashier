@@ -5359,38 +5359,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   mounted: function mounted() {
     console.log("Component mounted.");
@@ -5444,8 +5412,8 @@ __webpack_require__.r(__webpack_exports__);
       html += '<span class="qt-minus">-</span>';
       html += '<span class="qt">' + product.quantity + "</span>";
       html += '<span class="qt-plus">+</span>';
-      html += '<h2 class="full-price">' + product.amount + "</h2>";
-      html += '<h2 class="price">' + this.productData[product.product_id].price + "</h2>";
+      html += '<h2 class="full-price">RM ' + product.amount / 100 + "</h2>";
+      html += '<h2 class="price">RM ' + this.productData[product.product_id].price / 100 + "</h2>";
       html += "</footer>";
       html += "</article>";
       var exists = $("#user-cart").has("#" + cartSectionId).length;
@@ -5459,10 +5427,10 @@ __webpack_require__.r(__webpack_exports__);
         $("#user-cart").append(section);
       }
 
-      $(".subtotal span").html(product.calculated_amount);
+      $(".subtotal span").html(product.calculated_amount / 100);
       $(".tax span").html(product.tax + ' %');
       $(".service_charge span").html(product.service_charge + ' %');
-      $(".total span").html(product.payable_amount);
+      $(".total span").html(product.payable_amount / 100);
       this.payableAmount = product.payable_amount;
       $(".qt-plus").click(function () {
         var productId = $(this).parent().attr("product_id");
@@ -5486,13 +5454,11 @@ __webpack_require__.r(__webpack_exports__);
     },
     decrement: function decrement(productId) {
       var quantity = this.productQty[productId] ? this.productQty[productId] : 0;
-      console.log("deduct: quantity : ");
 
       if (quantity <= 0) {
         return false;
       }
 
-      console.log(quantity);
       this.productQty[productId] = quantity - 1;
       this.form.product_id = productId;
       this.form.quantity = this.productQty[productId];
@@ -5503,8 +5469,6 @@ __webpack_require__.r(__webpack_exports__);
 
       this.form.put("api/cart").then(function (_ref) {
         var data = _ref.data;
-        console.log("get product:");
-        console.log(data.data);
 
         _this.loadCart(data.data);
       })["catch"](function (error) {
@@ -5522,6 +5486,7 @@ __webpack_require__.r(__webpack_exports__);
         html += '<header class="productlist" product_id=' + product.id + ">";
         html += '   <a class="productid">' + product.id + "</a>";
         html += '   <a class="productname">' + product.name + "</a>";
+        html += '   <div class="productprice text-center">RM ' + product.price / 100 + "</div>";
         html += "</header>";
       });
       html += "</article>"; // document.getElementById('product').innerHTML  = html;
@@ -5537,12 +5502,9 @@ __webpack_require__.r(__webpack_exports__);
 
       axios.get("api/carts").then(function (_ref2) {
         var data = _ref2.data;
-        console.log("get product:");
         _this3.products = data.data;
 
         _this3.loadProducts(_this3.products);
-
-        console.log(data);
       });
     },
     getProducts: function getProducts() {
@@ -5550,12 +5512,9 @@ __webpack_require__.r(__webpack_exports__);
 
       axios.get("api/products").then(function (_ref3) {
         var data = _ref3.data;
-        console.log("get product:");
         _this4.products = data.data;
 
         _this4.loadProducts(_this4.products);
-
-        console.log(data);
       });
     },
     checkout: function checkout() {
@@ -5571,8 +5530,6 @@ __webpack_require__.r(__webpack_exports__);
       } else {
         this.form.post("api/cart/checkout").then(function (_ref4) {
           var data = _ref4.data;
-          console.log("get cart checkout :");
-          console.log(data.data);
           _this5.form.order_id = data.data.id;
           $('#checkoutModal').modal('show');
         })["catch"](function (error) {
@@ -5587,8 +5544,6 @@ __webpack_require__.r(__webpack_exports__);
 
       this.form.post("api/order/request-cancel").then(function (_ref5) {
         var data = _ref5.data;
-        console.log("cancel or refund checkout :");
-        console.log(data.data);
         $("#user-cart").html("");
         alert(data.message);
       })["catch"](function (error) {
@@ -5603,7 +5558,7 @@ __webpack_require__.r(__webpack_exports__);
         return false;
       }
 
-      if (this.totalPaid < this.payableAmount) {
+      if (this.totalPaid * 100 < this.payableAmount) {
         alert('total paid amount cant be less than payable amount.');
         return false;
       }
@@ -5624,7 +5579,6 @@ __webpack_require__.r(__webpack_exports__);
         alert(data.message);
       })["catch"](function (error) {
         var response = error.response.data;
-        console.log(response);
         alert(response.message);
       });
     },
@@ -5632,12 +5586,13 @@ __webpack_require__.r(__webpack_exports__);
       this.form.payment_method_id = event.target.value;
     },
     calculateChange: function calculateChange() {
-      var amount = this.totalPaid - this.payableAmount;
+      var amount = this.totalPaid * 100 - this.payableAmount;
 
       if (amount <= 0) {
         amount = 0;
       }
 
+      this.totalPaid = this.totalPaid.replace(/^0+/, '');
       this.changes = amount;
     },
     dismissCheckout: function dismissCheckout() {
@@ -29668,7 +29623,11 @@ var render = function () {
     _vm._v(" "),
     _vm._m(1),
     _vm._v(" "),
-    _c("div", { staticClass: "container", attrs: { id: "user-cart" } }),
+    _c("div", {
+      staticClass: "container",
+      staticStyle: { "border-top": "3px solid #000", "margin-top": "15px" },
+      attrs: { id: "user-cart" },
+    }),
     _vm._v(" "),
     _c(
       "footer",
@@ -29821,7 +29780,7 @@ var render = function () {
                     ),
                     _vm._v(" "),
                     _c("span", { staticClass: "m-auto" }, [
-                      _vm._v(_vm._s(_vm.payableAmount)),
+                      _vm._v(_vm._s(_vm.payableAmount / 100)),
                     ]),
                   ]),
                   _vm._v(" "),
@@ -29896,7 +29855,7 @@ var render = function () {
                     ),
                     _vm._v(" "),
                     _c("span", { staticClass: "m-auto" }, [
-                      _vm._v(_vm._s(_vm.changes)),
+                      _vm._v(_vm._s(_vm.changes / 100)),
                     ]),
                   ]),
                 ]),
@@ -29984,7 +29943,7 @@ var staticRenderFns = [
         staticClass: "subtotal",
         staticStyle: { float: "none", width: "auto" },
       },
-      [_vm._v("\n                  Sub Total: "), _c("span", [_vm._v("0")])]
+      [_vm._v("\n                  Sub Total: RM"), _c("span", [_vm._v("0")])]
     )
   },
   function () {
@@ -29992,7 +29951,7 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "total" }, [
-      _vm._v("\n                  Total: "),
+      _vm._v("\n                  Total: RM"),
       _c("span", [_vm._v("0")]),
     ])
   },
